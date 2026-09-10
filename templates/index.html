@@ -1,18 +1,26 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.bundle.min.js" integrity="sha384-qKXV1j0HvMUeCBQ+QVp7JcfGl760yU08IQ+GpUo5hlbpg51QRiuqHAJz8+BrxE/N" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.bundle.min.js" integrity="sha384-qKXV1j0HvMUeCBQ+QVp7JcfGl760yU08IQ+GpUo5hlbpg51QRiuqHAJz8+BrxE/N" crossorigin="anonymous"></script>
-    <title>Youtube from Andecy</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Search and watch YouTube videos without injected ads.">
+    <title>YouTube without ads</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <form action="/search" method="get">
-        <label for="name">Enter the name of the video you want to search.</label>
-        <input type="text" name="q" id="name">
-        <input type="submit">
-    </form>
+    <main class="shell shell--home">
+        <section class="hero" aria-labelledby="site-title">
+            <p class="eyebrow">Private, focused playback</p>
+            <h1 id="site-title">YouTube <span>without ads</span></h1>
+            <p class="lede">Search for a video and watch it in a lightweight player with selectable quality.</p>
+            <form class="search-form" action="{{ url_for('search') }}" method="get">
+                <label class="sr-only" for="query">Search for a video</label>
+                <input id="query" name="q" type="search" placeholder="Search YouTube…" maxlength="200"
+                       autocomplete="off" required autofocus>
+                <button type="submit">Search</button>
+            </form>
+            <p class="hint">No account required. Search terms are sent to YouTube through yt-dlp.</p>
+        </section>
+    </main>
 </body>
 </html>

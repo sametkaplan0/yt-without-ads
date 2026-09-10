@@ -1,12 +1,77 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Youtube from Andecy</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ video.title if video else "Video" }} | YouTube without ads</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <video src="{{ watchvideo.download() }}"></video>
+    <header class="site-header">
+        <a class="brand" href="{{ url_for('index') }}">YT<span>·</span>clean</a>
+        <a class="text-link" href="{{ url_for('index') }}">New search</a>
+    </header>
+    <main class="shell">
+        {% if error %}
+            <section class="notice notice--error" role="alert">
+                <h1>Playback unavailable</h1>
+                <p>{{ error }}</p>
+                <a class="button-link" href="{{ url_for('index') }}">Back to search</a>
+            </section>
+        {% else %}
+            <div class="watch-layout">
+                <article class="watch">
+                    <div class="player-wrap">
+                        <video controls playsinline preload="metadata"
+                               {% if video.thumbnail %}poster="{{ video.thumbnail }}"{% endif %}
+                               src="{{ video.stream_url }}">
+                            Your browser does not support HTML5 video.
+                        </video>
+                        <div class="player-toolbar">
+                            <span class="player-status">Now playing</span>
+                            {% if video.available_qualities %}
+                                <form class="quality-form" method="get" action="{{ url_for('video') }}">
+                                    <input type="hidden" name="id" value="{{ video.id }}">
+                                    <label for="quality">Quality</label>
+                                    <select id="quality" name="quality" onchange="this.form.submit()">
+                                        <option value="">Auto</option>
+                                        {% for quality in video.available_qualities %}
+                                            <option value="{{ quality }}" {% if quality == video.selected_quality %}selected{% endif %}>{{ quality }}p</option>
+                                        {% endfor %}
+                                    </select>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </article>
+                <aside class="comments-panel">
+                    <div class="video-info">
+                        <p class="eyebrow">Video</p>
+                        <h1>{{ video.title }}</h1>
+                        {% if video.channel %}<p class="muted">{{ video.channel }}</p>{% endif %}
+                        {% if video.description %}
+                            <details class="description">
+                                <summary>About this video</summary>
+                                <p>{{ video.description }}</p>
+                            </details>
+                        {% endif %}
+                    </div>
+                    <h2>Comments <span>{{ comments|length }}</span></h2>
+                    <form class="comment-form" method="post" action="{{ url_for('add_comment', video_id=video.id) }}">
+                        <label class="sr-only" for="comment">Write a comment</label>
+                        <textarea id="comment" name="comment" maxlength="1000" placeholder="Share your thoughts..." required></textarea>
+                        <button type="submit">Comment</button>
+                    </form>
+                    <div class="comments-list">
+                        {% for comment in comments|reverse %}
+                            <article class="comment"><p>{{ comment.text }}</p></article>
+                        {% else %}
+                            <p class="muted">No comments yet. Be the first to comment.</p>
+                        {% endfor %}
+                    </div>
+                </aside>
+            </div>
+        {% endif %}
+    </main>
 </body>
 </html>

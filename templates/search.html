@@ -1,36 +1,54 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.bundle.min.js" integrity="sha384-qKXV1j0HvMUeCBQ+QVp7JcfGl760yU08IQ+GpUo5hlbpg51QRiuqHAJz8+BrxE/N" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.bundle.min.js" integrity="sha384-qKXV1j0HvMUeCBQ+QVp7JcfGl760yU08IQ+GpUo5hlbpg51QRiuqHAJz8+BrxE/N" crossorigin="anonymous"></script>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search | Youtube from Andecy</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Search results">
+    <title>{% if query %}{{ query }} — {% endif %}Search | YouTube without ads</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <form action="/search" method="get">
-        <label for="name">Enter the name of the video you want to search.</label>
-        <input type="text" name="q" id="name" spellcheck="false">
-        <input type="submit">
-    <ol>
-        {% for v in r.results %}
-            <div class="all-info">
-                <img src="{{ yt(v.watch_url).thumbnail_url }}" alt="yt-video-img" style="height: 18%;width: 19%;">
-                <div class="text-info">
-                    <ul><a href="{{ v.watch_url }}">{{ v.title }}</a><br><br><a href="{{ yt(v.watch_url).channel_url }}">{{ yt(v.watch_url).author }}</a></ul>
-                    <br>
-                </div>
+    <header class="site-header">
+        <a class="brand" href="{{ url_for('index') }}">YT<span>·</span>clean</a>
+        <form class="search-form search-form--compact" action="{{ url_for('search') }}" method="get">
+            <label class="sr-only" for="query">Search for a video</label>
+            <input id="query" name="q" type="search" value="{{ query }}" maxlength="200" required>
+            <button type="submit">Search</button>
+        </form>
+    </header>
+    <main class="shell">
+        {% if error %}
+            <section class="notice notice--error" role="alert">{{ error }}</section>
+        {% elif query and not videos %}
+            <section class="empty-state">
+                <h1>No videos found</h1>
+                <p>Try different or less specific search terms.</p>
+            </section>
+        {% elif query %}
+            <div class="section-heading">
+                <p class="eyebrow">Results for</p>
+                <h1>{{ query }}</h1>
             </div>
-            <br>
+        {% endif %}
 
-        {%  endfor %}
-    </ol>
+        <ol class="video-grid">
+            {% for video in videos %}
+                <li class="video-card">
+                    <a href="{{ url_for('video', id=video.id) }}">
+                        {% if video.thumbnail %}
+                            <img src="{{ video.thumbnail }}" alt="{{ video.title }}" loading="lazy">
+                        {% else %}
+                            <div class="thumbnail-placeholder" aria-hidden="true">▶</div>
+                        {% endif %}
+                        <span class="card-body">
+                            <strong>{{ video.title }}</strong>
+                            {% if video.channel %}<span class="muted">{{ video.channel }}</span>{% endif %}
+                            {% if video.duration_text %}<span class="muted">{{ video.duration_text }}</span>{% endif %}
+                        </span>
+                    </a>
+                </li>
+            {% endfor %}
+        </ol>
+    </main>
 </body>
-<style>
-.all-info {
-  display: flex; /* flexbox kullanarak resim ve yazıları yatay olarak hizalayabilirsiniz */
-  align-items: center; /* resim ve yazıları dikey olarak hizalayın */
-}
-</style>
 </html>
